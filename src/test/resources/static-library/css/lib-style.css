@@ -1,0 +1,138 @@
+/* lib-style.css */
+:root {
+	--background-color: #000000;
+	--color: #FFFFFF;
+}
+
+@font-face {
+	font-family: 'Font Awesome';
+	font-style: normal;
+	font-weight: 400;
+	font-display: block;
+	src: url("#context.path.resource#font/fontawesome/fa-regular-400.woff2") format("woff2"); 
+}
+.awesome {
+	font-family: Font Awesome;
+	font-weight: 400;
+}
+
+@font-face {
+	font-family: 'Font Awesome';
+	font-style: normal;
+	font-weight: 900;
+	font-display: block;
+	src: url("#context.path.resource#font/fontawesome/fa-solid-900.woff2") format("woff2"); 
+}
+.awesome.bold {
+	font-weight: 900;
+}
+
+/*
+Brands aren't used in most cases so apps can load them only if needed
+@font-face {
+	font-family: 'Font Awesome Brands';
+	font-style: normal;
+	font-weight: 400;
+	font-display: block;
+	src: url("#context.path.resource#font/fontawesome/fa-brands-400.woff2") format("woff2");
+}
+.awesome.bran {
+	font-family: Font Awesome Brands;
+	font-weight: 400;
+}
+*/
+
+body {
+	background-color: var(--background-color);
+	color: var(--color);
+	font-family: Arial;
+	line-height: 1.25em;
+}
+
+body, button, input[type="button"], input[type="submit"] {
+	font-size: 12pt;
+}
+
+input[type="text"], input[type="password"], textarea {
+	font-family: Monospace;
+	font-size: 10pt;
+	padding: 0px;
+}
+
+a, a:hover, a:visited {
+	color: var(--color);
+}
+
+body > div > div.header {
+	position: fixed;
+	top: 0em;
+	left: 0em;
+	right: 0em;
+	height: 3em;
+    padding: .5em;	
+	background-color: var(--background-color);
+	text-align: center;
+    background-repeat: no-repeat;
+    background-position: 50% 60%;
+    background-size: contain;
+    z-index: 1000;
+}
+
+body > div > div.header:after {
+    content: '';
+    position: fixed;
+    top: 4em;
+    left: 0em;
+    right: 0em;
+    height: 1em;
+    background: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(255,255,255,0) 100%);
+}
+
+body > div.body {
+	position: absolute;
+	top: 4em;
+	left: 0em;
+	right: 0em;
+	bottom: 0em;
+	padding: 0.5em;
+	padding-top: 1em;
+}
+
+body > div.body > div.content {
+	padding-bottom: 1em; /* see footer height */
+}
+
+body > div.footer {
+	position: fixed;
+	left: 0em;
+	right: 0em;
+	bottom: 0em;
+	height: 0em;
+	padding-left: 1em;
+	padding-right: 1em;
+	background-color: var(--background-color);
+	text-align: center;
+	z-index: 500;
+}
+
+body > div.footer:before {
+    content: '';
+    position: fixed;
+    bottom: 0em;
+    left: 0em;
+    right: 0em;
+    height: 1em;
+    background: linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(255,255,255,0) 100%);
+}
+
+/* fix jumping vertical scroll bar */
+body {
+    overflow-x: hidden;
+}
+
+body > div > div.header,
+body > div.body,
+body > div.footer {
+    margin-right: calc(100% - 100vw);
+}
+/* end fix */
