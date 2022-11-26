@@ -42,6 +42,10 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>web.resources</artifactId>
         </dependency>
 
@@ -133,7 +137,6 @@
                         --add-opens com.github.lc.oss.commons.web/com.github.lc.oss.commons.web.service=ALL-UNNAMED
                         --add-opens com.github.lc.oss.commons.web/com.github.lc.oss.commons.web.tokens=ALL-UNNAMED
                         --add-opens com.github.lc.oss.commons.web/com.github.lc.oss.commons.web.util=ALL-UNNAMED
-                        --add-opens com.github.lc.oss.commons.web/com.github.lc.oss.commons.web.validation=ALL-UNNAMED
                         --add-opens com.github.lc.oss.commons.l10n/com.github.lc.oss.commons.l10n=com.github.lc.oss.commons.web
                         ${JacocoArgs}
                     </argLine>
