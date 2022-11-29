@@ -11,6 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -164,7 +165,7 @@ public class DefaultAppConfiguration implements WebMvcConfigurer {
         this.configureDefaultPublicAccessUrls(http);
 
         /* Default deny all rule */
-        http.authorizeRequests(). //
+        http.authorizeHttpRequests(). //
                 anyRequest(). //
                 denyAll();
 
@@ -174,16 +175,24 @@ public class DefaultAppConfiguration implements WebMvcConfigurer {
     /* Security */
     protected void configureDefaultPublicAccessUrls(HttpSecurity http) throws Exception {
         /* Public Access */
-        http.authorizeRequests(). //
-                regexMatchers(HttpMethod.GET, //
+        http.authorizeHttpRequests(). //
+                requestMatchers(this.matchers(HttpMethod.GET, //
                         /* Resources */
                         "^/css$", //
                         "^/favicon.ico$", //
                         "^/font/fontawesome/fa-(?:brands|regular|solid)-(?:400|900).woff2$", //
                         "^/js$", //
                         "^/js/[a-zA-Z0-9]+$", //
-                        "^/l10n/[a-z]{2}(?:-[A-Z]{2})?/messages.Application.Error.1$")
+                        "^/l10n/[a-z]{2}(?:-[A-Z]{2})?/messages.Application.Error.1$"))
                 .permitAll();
+    }
+
+    protected RegexRequestMatcher[] matchers(HttpMethod method, String... patterns) {
+        RegexRequestMatcher[] matchers = new RegexRequestMatcher[patterns.length];
+        for (int i = 0; i < patterns.length; i++) {
+            matchers[i] = RegexRequestMatcher.regexMatcher(method, patterns[i]);
+        }
+        return matchers;
     }
 
     protected void configureDefaultHeaders(HttpSecurity http) throws Exception {
