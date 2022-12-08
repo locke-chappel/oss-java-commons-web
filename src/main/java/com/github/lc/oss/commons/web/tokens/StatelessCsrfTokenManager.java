@@ -3,10 +3,6 @@ package com.github.lc.oss.commons.web.tokens;
 import java.util.Arrays;
 import java.util.UUID;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -17,6 +13,10 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.github.lc.oss.commons.encoding.Encodings;
 import com.github.lc.oss.commons.hashing.Hashes;
 import com.github.lc.oss.commons.web.util.CookiePrefixParser;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class StatelessCsrfTokenManager implements CsrfTokenManager {
     private static final String CSRF_HEADER_ID = "X-CSRF";

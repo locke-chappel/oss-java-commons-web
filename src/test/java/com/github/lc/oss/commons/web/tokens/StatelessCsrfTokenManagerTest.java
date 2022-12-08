@@ -1,9 +1,5 @@
 package com.github.lc.oss.commons.web.tokens;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +12,10 @@ import com.github.lc.oss.commons.encoding.Encodings;
 import com.github.lc.oss.commons.hashing.Hashes;
 import com.github.lc.oss.commons.testing.AbstractTest;
 import com.github.lc.oss.commons.web.util.CookiePrefixParser;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class StatelessCsrfTokenManagerTest extends AbstractTest {
     private StatelessCsrfTokenManager manager;

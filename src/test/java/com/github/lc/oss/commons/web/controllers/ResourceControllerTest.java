@@ -11,8 +11,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -35,6 +33,8 @@ import com.github.lc.oss.commons.web.resources.Minifier;
 import com.github.lc.oss.commons.web.resources.StaticResourceFileResolver;
 import com.github.lc.oss.commons.web.services.ETagService;
 import com.github.lc.oss.commons.web.tokens.CsrfTokenManager;
+
+import jakarta.servlet.ServletContext;
 
 public class ResourceControllerTest extends AbstractMockTest {
     private static class TestController extends ResourceController {

@@ -7,10 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +14,10 @@ import org.springframework.beans.factory.annotation.Value;
 import com.github.lc.oss.commons.util.IoTools;
 import com.github.lc.oss.commons.web.controllers.ThemeResourceFileResolver;
 import com.github.lc.oss.commons.web.util.CookiePrefixParser;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class ThemeService {
     private static final int COOKIE_MAX_AGE = 10 * 365 * 24 * 60 * 60;

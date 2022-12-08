@@ -4,11 +4,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.RedirectStrategy;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.core5.http.io.SocketConfig;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,7 +21,6 @@ import org.springframework.web.client.RestTemplate;
 
 public class HttpService {
     private static final StringHttpMessageConverter UTF_8_CONVERTER = new StringHttpMessageConverter(StandardCharsets.UTF_8);
-    private static final RedirectStrategy REDIRECT_STRATEGY = new DefaultRedirectStrategy(new String[0]);
 
     protected static final int DEFAULT_TIMEOUT = 30 * 1000;
 
@@ -46,12 +46,19 @@ public class HttpService {
          *
          * Note: HttpClient is not reusable :(
          */
+        SocketConfig socketConfig = SocketConfig.custom(). //
+                setSoTimeout(this.getTimeout(), TimeUnit.MILLISECONDS). //
+                build();
+
+        PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager();
+        connManager.setDefaultSocketConfig(socketConfig);
+
         HttpClient client = HttpClientBuilder.create(). //
-                setRedirectStrategy(HttpService.REDIRECT_STRATEGY). //
+                disableRedirectHandling(). //
+                setConnectionManager(connManager). //
                 build();
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(client);
         factory.setConnectTimeout(this.getTimeout());
-        factory.setReadTimeout(this.getTimeout());
         return factory;
     }
 

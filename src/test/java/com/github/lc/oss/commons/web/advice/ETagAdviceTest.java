@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.junit.jupiter.api.Assertions;
@@ -29,6 +26,9 @@ import org.springframework.web.servlet.ModelAndView;
 import com.github.lc.oss.commons.testing.AbstractMockTest;
 import com.github.lc.oss.commons.web.annotations.HttpCachable;
 import com.github.lc.oss.commons.web.services.ETagService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class ETagAdviceTest extends AbstractMockTest {
     private static class HelperClass {

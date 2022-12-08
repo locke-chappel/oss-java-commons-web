@@ -4,9 +4,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -27,6 +24,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.github.lc.oss.commons.web.annotations.HttpCachable;
 import com.github.lc.oss.commons.web.services.ETagService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Aspect
 @Order(Ordered.HIGHEST_PRECEDENCE)

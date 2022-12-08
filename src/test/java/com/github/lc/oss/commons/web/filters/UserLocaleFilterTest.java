@@ -3,11 +3,6 @@ package com.github.lc.oss.commons.web.filters;
 import java.io.IOException;
 import java.util.Locale;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +14,11 @@ import org.springframework.http.HttpHeaders;
 import com.github.lc.oss.commons.l10n.L10N;
 import com.github.lc.oss.commons.l10n.UserLocale;
 import com.github.lc.oss.commons.testing.AbstractMockTest;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class UserLocaleFilterTest extends AbstractMockTest {
     @Mock

@@ -1,7 +1,7 @@
 package com.github.lc.oss.commons.web.tokens;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface CsrfTokenManager {
     String getCookieId();

@@ -3,11 +3,6 @@ package com.github.lc.oss.commons.web.controllers;
 import java.io.IOException;
 import java.util.Collection;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +24,11 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import com.github.lc.oss.commons.serialization.Message;
 import com.github.lc.oss.commons.serialization.Response;
 import com.github.lc.oss.commons.testing.AbstractMockTest;
+
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class ExceptionControllerTest extends AbstractMockTest {
     private static class SelfRootedException extends Exception {

@@ -3,10 +3,6 @@ package com.github.lc.oss.commons.web.controllers;
 import java.io.IOException;
 import java.util.Arrays;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -28,6 +24,10 @@ import com.github.lc.oss.commons.serialization.Message;
 import com.github.lc.oss.commons.serialization.Response;
 import com.github.lc.oss.commons.web.config.Authorities;
 import com.github.lc.oss.commons.web.util.ContextUtil;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @PreAuthorize(Authorities.PUBLIC)
 @Order(Ordered.HIGHEST_PRECEDENCE)

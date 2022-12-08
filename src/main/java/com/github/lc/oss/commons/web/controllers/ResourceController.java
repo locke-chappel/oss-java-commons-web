@@ -12,8 +12,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
-import javax.servlet.ServletContext;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +37,8 @@ import com.github.lc.oss.commons.web.resources.StaticResourceFileResolver;
 import com.github.lc.oss.commons.web.services.ETagService;
 import com.github.lc.oss.commons.web.tokens.CsrfTokenManager;
 import com.github.lc.oss.commons.web.util.ContextUtil;
+
+import jakarta.servlet.ServletContext;
 
 public class ResourceController extends AbstractResourceResolver {
     protected static final Map<String, String> FILE_EXT_MEDIATYPES;

@@ -1,6 +1,6 @@
 package com.github.lc.oss.commons.web.util;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 public class ContextUtil {
     public static String getAbsoluteUrl(String path, ServletContext context) {

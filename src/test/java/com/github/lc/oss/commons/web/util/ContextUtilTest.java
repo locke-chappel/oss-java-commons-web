@@ -1,12 +1,12 @@
 package com.github.lc.oss.commons.web.util;
 
-import javax.servlet.ServletContext;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.github.lc.oss.commons.testing.AbstractMockTest;
+
+import jakarta.servlet.ServletContext;
 
 public class ContextUtilTest extends AbstractMockTest {
     @Test

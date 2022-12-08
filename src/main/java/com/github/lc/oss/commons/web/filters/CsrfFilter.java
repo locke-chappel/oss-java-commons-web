@@ -5,17 +5,17 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.github.lc.oss.commons.web.tokens.CsrfTokenManager;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class CsrfFilter extends OncePerRequestFilter {
     protected static final Set<String> SAFE_CSRF_METHODS;
