@@ -1,32 +1,20 @@
 package com.github.lc.oss.commons.web.config;
 
-import java.time.Clock;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.web.context.annotation.RequestScope;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.github.lc.oss.commons.l10n.L10N;
 import com.github.lc.oss.commons.l10n.UserLocale;
-import com.github.lc.oss.commons.serialization.TrimmingModule;
-import com.github.lc.oss.commons.util.PathNormalizer;
 import com.github.lc.oss.commons.web.advice.CommonAdvice;
 import com.github.lc.oss.commons.web.advice.ETagAdvice;
-import com.github.lc.oss.commons.web.controllers.ExceptionController;
 import com.github.lc.oss.commons.web.controllers.ThemeResourceFileResolver;
 import com.github.lc.oss.commons.web.controllers.UserTheme;
 import com.github.lc.oss.commons.web.filters.CsrfFilter;
-import com.github.lc.oss.commons.web.filters.SecurityHeadersFilter;
 import com.github.lc.oss.commons.web.filters.UserLocaleFilter;
 import com.github.lc.oss.commons.web.filters.UserThemeFilter;
 import com.github.lc.oss.commons.web.resources.Minifier;
@@ -36,27 +24,9 @@ import com.github.lc.oss.commons.web.tokens.CsrfTokenManager;
 import com.github.lc.oss.commons.web.tokens.StatelessCsrfTokenManager;
 import com.github.lc.oss.commons.web.util.CookiePrefixParser;
 
-public class DefaultAppConfiguration implements WebMvcConfigurer {
+public class DefaultAppConfiguration extends AbstractConfiguration {
     @Value("${application.security.enableCsrfProtection:true}")
     private boolean enableCsrfProtection;
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void configurePathMatch(PathMatchConfigurer configurer) {
-        WebMvcConfigurer.super.configurePathMatch(configurer);
-
-        /*
-         * Spring 5.2.4 marked this as deprecated. They claim people shouldn't rely on
-         * this being 'true'; however, 'true' is the default so since I want this
-         * 'false' I have to use a deprecated method now :(
-         */
-        configurer.setUseSuffixPatternMatch(false);
-    }
-
-    @Bean
-    public Clock clock() {
-        return Clock.systemDefaultZone();
-    }
 
     @Bean
     public CommonAdvice commonAdvice() {
@@ -71,11 +41,6 @@ public class DefaultAppConfiguration implements WebMvcConfigurer {
     @Bean
     public ETagAdvice eTagAdvice() {
         return new ETagAdvice();
-    }
-
-    @Bean
-    public ExceptionController exceptionController() {
-        return new ExceptionController();
     }
 
     @Bean
@@ -103,16 +68,6 @@ public class DefaultAppConfiguration implements WebMvcConfigurer {
         MinifierService service = new MinifierService();
         service.setEnabled(enabled);
         return service;
-    }
-
-    @Bean
-    public PathNormalizer pathNormalizer() {
-        return new PathNormalizer();
-    }
-
-    @Bean
-    public TrimmingModule trimmingModule() {
-        return new TrimmingModule();
     }
 
     @Bean
@@ -161,18 +116,8 @@ public class DefaultAppConfiguration implements WebMvcConfigurer {
         return new UserThemeFilter();
     }
 
-    protected void configureDefaults(HttpSecurity http) throws Exception {
-        this.configureDefaultPublicAccessUrls(http);
-
-        /* Default deny all rule */
-        http.authorizeHttpRequests(). //
-                anyRequest(). //
-                denyAll();
-
-        this.configureDefaultHeaders(http);
-    }
-
     /* Security */
+    @Override
     protected void configureDefaultPublicAccessUrls(HttpSecurity http) throws Exception {
         /* Public Access */
         http.authorizeHttpRequests(). //
@@ -187,24 +132,9 @@ public class DefaultAppConfiguration implements WebMvcConfigurer {
                 .permitAll();
     }
 
-    protected RegexRequestMatcher[] matchers(HttpMethod method, String... patterns) {
-        RegexRequestMatcher[] matchers = new RegexRequestMatcher[patterns.length];
-        for (int i = 0; i < patterns.length; i++) {
-            matchers[i] = RegexRequestMatcher.regexMatcher(method, patterns[i]);
-        }
-        return matchers;
-    }
-
+    @Override
     protected void configureDefaultHeaders(HttpSecurity http) throws Exception {
-        /* Spring's CSRF protection is not RESTful */
-        http.csrf().disable();
-
-        /* Disable auto-creation of sessions */
-        http.sessionManagement(). //
-                sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-        /* Add standard security headers */
-        http.addFilterAfter(this.securityHeadersFilter(), BasicAuthenticationFilter.class);
+        super.configureDefaultHeaders(http);
 
         /* Add RESTful CSRF protection solution */
         if (this.enableCsrfProtection) {
@@ -221,14 +151,5 @@ public class DefaultAppConfiguration implements WebMvcConfigurer {
     @Bean
     public CsrfTokenManager csrfTokenManager() {
         return new StatelessCsrfTokenManager();
-    }
-
-    public SecurityHeadersFilter securityHeadersFilter() {
-        return new SecurityHeadersFilter();
-    }
-
-    @Bean
-    public SessionRegistry sessionRegistry() {
-        return new SessionRegistryImpl();
     }
 }

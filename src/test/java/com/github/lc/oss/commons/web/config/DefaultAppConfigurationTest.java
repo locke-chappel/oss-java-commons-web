@@ -12,7 +12,6 @@ import org.springframework.security.authorization.AuthorizationEventPublisher;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 
 import com.github.lc.oss.commons.l10n.L10N;
 import com.github.lc.oss.commons.testing.AbstractMockTest;
@@ -24,15 +23,11 @@ public class DefaultAppConfigurationTest extends AbstractMockTest {
 
         L10N l10n = config.l10n();
 
-        Assertions.assertNotNull(config.clock());
         Assertions.assertNotNull(config.commonAdvice());
         Assertions.assertNotNull(config.cookiePrefixParser());
         Assertions.assertNotNull(config.eTagAdvice());
-        Assertions.assertNotNull(config.exceptionController());
         Assertions.assertNotNull(l10n);
         Assertions.assertNotNull(config.minifier(false));
-        Assertions.assertNotNull(config.pathNormalizer());
-        Assertions.assertNotNull(config.trimmingModule());
         Assertions.assertNotNull(config.userLocale());
         Assertions.assertNotNull(config.userLocaleFilter());
         Assertions.assertNotNull(config.themeService());
@@ -43,8 +38,6 @@ public class DefaultAppConfigurationTest extends AbstractMockTest {
         Assertions.assertNotNull(config.extThemeResourceFileResolver("ext", 1));
         Assertions.assertNotNull(config.csrfFilter());
         Assertions.assertNotNull(config.csrfTokenManager());
-        Assertions.assertNotNull(config.securityHeadersFilter());
-        Assertions.assertNotNull(config.sessionRegistry());
 
         Assertions.assertFalse(l10n.isCaching());
         Method method = this.findMethod("getExternalL10NRoot", L10N.class);
@@ -58,18 +51,6 @@ public class DefaultAppConfigurationTest extends AbstractMockTest {
             Assertions.fail("Unexpected exception");
         }
         method.setAccessible(canAccess);
-    }
-
-    @SuppressWarnings("deprecation")
-    @Test
-    public void test_configurePathMatch() {
-        PathMatchConfigurer configurer = Mockito.mock(PathMatchConfigurer.class);
-
-        DefaultAppConfiguration config = new DefaultAppConfiguration();
-
-        Mockito.when(configurer.setUseSuffixPatternMatch(false)).thenReturn(null);
-
-        config.configurePathMatch(configurer);
     }
 
     @Test
