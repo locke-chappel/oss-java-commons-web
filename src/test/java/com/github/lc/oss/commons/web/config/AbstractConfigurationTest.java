@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 
+import com.github.lc.oss.commons.encoding.Encodings;
 import com.github.lc.oss.commons.encryption.config.ConfigKey;
 import com.github.lc.oss.commons.encryption.config.EncryptedConfig;
 import com.github.lc.oss.commons.testing.AbstractMockTest;
@@ -134,7 +135,7 @@ public class AbstractConfigurationTest extends AbstractMockTest {
 
         Environment env = Mockito.mock(Environment.class);
         Mockito.when(env.getProperty("knative", Boolean.class, Boolean.FALSE)).thenReturn(true);
-        Mockito.when(env.getProperty("CONFIG")).thenReturn("{\"Key1\" : \"knative\", \"Key2\" : 100 }");
+        Mockito.when(env.getProperty("CONFIG")).thenReturn(Encodings.Base64.encode("{\"Key1\" : \"knative\", \"Key2\" : 100 }"));
 
         TestSecure result = config.loadEncryptedConfig(env, TestSecure.TestKeys.values(), TestSecure.class);
         Assertions.assertNotNull(result);

@@ -18,6 +18,7 @@ import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.lc.oss.commons.encoding.Encodings;
 import com.github.lc.oss.commons.encryption.config.ConfigKey;
 import com.github.lc.oss.commons.encryption.config.EncryptedConfig;
 import com.github.lc.oss.commons.encryption.config.EncryptedConfigUtil;
@@ -66,7 +67,7 @@ public abstract class AbstractConfiguration implements WebMvcConfigurer {
     protected <T extends EncryptedConfig, K extends ConfigKey> T loadEncryptedConfig(@Autowired Environment env, K[] keys, Class<T> clazz) {
         if (this.isKnative(env)) {
             try {
-                String json = env.getProperty("CONFIG");
+                String json = Encodings.Base64.decodeString(env.getProperty("CONFIG"));
                 ObjectMapper mapper = new ObjectMapper();
                 return mapper.readValue(json, clazz);
             } catch (Exception ex) {
