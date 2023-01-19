@@ -130,12 +130,26 @@ public class AbstractConfigurationTest extends AbstractMockTest {
     }
 
     @Test
-    public void test_loadEncryptedConfig_knative() {
+    public void test_loadEncryptedConfig_knative_json() {
         AbstractConfiguration config = new TestConfig();
 
         Environment env = Mockito.mock(Environment.class);
         Mockito.when(env.getProperty("knative", Boolean.class, Boolean.FALSE)).thenReturn(true);
-        Mockito.when(env.getProperty("CONFIG")).thenReturn(Encodings.Base64.encode("{\"Key1\" : \"knative\", \"Key2\" : 100 }"));
+        Mockito.when(env.getProperty("CONFIG", "")).thenReturn("{\"Key1\" : \"knative\", \"Key2\" : 100 }");
+
+        TestSecure result = config.loadEncryptedConfig(env, TestSecure.TestKeys.values(), TestSecure.class);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("knative", result.get(TestSecure.TestKeys.Key1));
+        Assertions.assertEquals(100, result.get(TestSecure.TestKeys.Key2));
+    }
+
+    @Test
+    public void test_loadEncryptedConfig_knative_bae64() {
+        AbstractConfiguration config = new TestConfig();
+
+        Environment env = Mockito.mock(Environment.class);
+        Mockito.when(env.getProperty("knative", Boolean.class, Boolean.FALSE)).thenReturn(true);
+        Mockito.when(env.getProperty("CONFIG", "")).thenReturn(Encodings.Base64.encode("{\"Key1\" : \"knative\", \"Key2\" : 100 }"));
 
         TestSecure result = config.loadEncryptedConfig(env, TestSecure.TestKeys.values(), TestSecure.class);
         Assertions.assertNotNull(result);
@@ -149,7 +163,7 @@ public class AbstractConfigurationTest extends AbstractMockTest {
 
         Environment env = Mockito.mock(Environment.class);
         Mockito.when(env.getProperty("knative", Boolean.class, Boolean.FALSE)).thenReturn(true);
-        Mockito.when(env.getProperty("CONFIG")).thenReturn("not JSON");
+        Mockito.when(env.getProperty("CONFIG", "")).thenReturn("not JSON");
 
         try {
             config.loadEncryptedConfig(env, TestSecure.TestKeys.values(), TestSecure.class);

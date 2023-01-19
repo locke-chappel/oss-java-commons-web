@@ -67,7 +67,11 @@ public abstract class AbstractConfiguration implements WebMvcConfigurer {
     protected <T extends EncryptedConfig, K extends ConfigKey> T loadEncryptedConfig(@Autowired Environment env, K[] keys, Class<T> clazz) {
         if (this.isKnative(env)) {
             try {
-                String json = Encodings.Base64.decodeString(env.getProperty("CONFIG"));
+                String json = env.getProperty("CONFIG", "");
+                if (json.charAt(0) != '{') {
+                    json = Encodings.Base64.decodeString(json);
+                }
+
                 ObjectMapper mapper = new ObjectMapper();
                 return mapper.readValue(json, clazz);
             } catch (Exception ex) {
