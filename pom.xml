@@ -13,6 +13,7 @@
     <artifactId>web</artifactId>
     <version>1.0.0</version>
     <name>${project.artifactId}</name>
+    <description>A basic extension of the Spring web framework to accelerate application development</description>
     <url>https://github.com/locke-chappel/oss-commons-web</url>
 
     <licenses>
