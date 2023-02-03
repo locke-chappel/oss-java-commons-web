@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -23,6 +22,7 @@ import com.github.lc.oss.commons.l10n.Variable;
 import com.github.lc.oss.commons.serialization.JsonMessage;
 import com.github.lc.oss.commons.serialization.Jsonable;
 import com.github.lc.oss.commons.serialization.JsonableCollection;
+import com.github.lc.oss.commons.serialization.JsonableHashSet;
 import com.github.lc.oss.commons.serialization.JsonableMap;
 import com.github.lc.oss.commons.serialization.Message;
 import com.github.lc.oss.commons.serialization.Message.Severities;
@@ -77,13 +77,33 @@ public abstract class AbstractController {
         return this.respond(Arrays.asList(messages));
     }
 
-    @SuppressWarnings("unchecked")
     protected <T extends Response<? extends Jsonable>> ResponseEntity<T> respond(Collection<Message> messages) {
-        Set<Message> errors = messages.stream(). //
+        JsonableHashSet<JsonMessage> set = messages.stream(). //
+                filter(m -> m != null). //
+                map(m -> this.toMessage(m)). //
+                collect(Collectors.toCollection(JsonableHashSet::new));
+        return this.respond(set);
+    }
+
+    /**
+     * Helper method to disambiguate in some corner cases where respond(JsonMessage)
+     * selects the wrong method.
+     */
+    protected <T extends Response<? extends Jsonable>> ResponseEntity<T> respondMessage(JsonMessage messages) {
+        return this.respond(new JsonableHashSet<>(Arrays.asList(messages)));
+    }
+
+    protected <T extends Response<? extends Jsonable>> ResponseEntity<T> respond(JsonMessage... messages) {
+        return this.respond(new JsonableHashSet<>(Arrays.asList(messages)));
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T extends Response<? extends Jsonable>> ResponseEntity<T> respond(JsonableCollection<JsonMessage> messages) {
+        JsonableHashSet<JsonMessage> errors = messages.stream(). //
                 filter(m -> m != null). //
                 filter(m -> m.getSeverity() != null). //
                 filter(m -> m.getSeverity().name().equals(Severities.Error.name())). //
-                collect(Collectors.toSet());
+                collect(Collectors.toCollection(JsonableHashSet::new));
         if (!errors.isEmpty()) {
             return new ResponseEntity<>((T) new Response<>(errors), HttpStatus.UNPROCESSABLE_ENTITY);
         }
@@ -125,7 +145,7 @@ public abstract class AbstractController {
 
     protected <T extends Response<? extends Jsonable>> ResponseEntity<T> respond(Message.Category category, Message.Severity severity, int number,
             Variable... vars) {
-        return this.respond(this.toMessage(category, severity, number, vars));
+        return this.respond(new JsonableHashSet<>(Arrays.asList(this.toMessage(category, severity, number, vars))));
     }
 
     protected ResponseEntity<InputStreamResource> respond(InputStreamResource content, Map<String, String> headers) {
@@ -137,11 +157,14 @@ public abstract class AbstractController {
         return new ResponseEntity<>(content, responseHeaders, HttpStatus.OK);
     }
 
-    protected Message toMessage(Message message, Variable... vars) {
+    protected JsonMessage toMessage(Message message, Variable... vars) {
+        if (message instanceof JsonMessage) {
+            return (JsonMessage) message;
+        }
         return this.toMessage(message.getCategory(), message.getSeverity(), message.getNumber(), vars);
     }
 
-    protected Message toMessage(Message.Category category, Message.Severity severity, int number, Variable... vars) {
+    protected JsonMessage toMessage(Message.Category category, Message.Severity severity, int number, Variable... vars) {
         String text = null;
         if (this.getL10n() != null) {
             text = this.getText(String.format("messages.%s.%s.%d", category.name(), severity.name(), number), vars);

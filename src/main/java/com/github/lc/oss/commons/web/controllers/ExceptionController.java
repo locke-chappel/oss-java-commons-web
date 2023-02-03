@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import com.github.lc.oss.commons.serialization.JsonMessage;
+import com.github.lc.oss.commons.serialization.JsonableHashSet;
 import com.github.lc.oss.commons.serialization.Message;
 import com.github.lc.oss.commons.serialization.Response;
 import com.github.lc.oss.commons.web.config.Authorities;
@@ -36,7 +38,7 @@ public class ExceptionController extends AbstractController {
     @Autowired(required = false)
     private AccessDeniedHandler accessDeniedHandler;
 
-    protected Message getErrorMessage() {
+    protected JsonMessage getErrorMessage() {
         return this.toMessage(Message.Categories.Application, Message.Severities.Error, 1);
     }
 
@@ -74,7 +76,7 @@ public class ExceptionController extends AbstractController {
         } else {
             this.getLogger().error("Unhandled exception", ex);
         }
-        return new ResponseEntity<>(new Response<>(Arrays.asList(this.getErrorMessage())), status);
+        return new ResponseEntity<>(new Response<>(new JsonableHashSet<>(Arrays.asList(this.getErrorMessage()))), status);
     }
 
     private Throwable getCause(Throwable ex) {

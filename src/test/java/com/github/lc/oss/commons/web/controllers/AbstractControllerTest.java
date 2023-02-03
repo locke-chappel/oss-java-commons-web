@@ -1,7 +1,6 @@
 package com.github.lc.oss.commons.web.controllers;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -21,6 +20,7 @@ import com.github.lc.oss.commons.l10n.UserLocale;
 import com.github.lc.oss.commons.l10n.Variable;
 import com.github.lc.oss.commons.serialization.JsonMessage;
 import com.github.lc.oss.commons.serialization.Jsonable;
+import com.github.lc.oss.commons.serialization.JsonableCollection;
 import com.github.lc.oss.commons.serialization.JsonableHashMap;
 import com.github.lc.oss.commons.serialization.JsonableHashSet;
 import com.github.lc.oss.commons.serialization.Message;
@@ -30,7 +30,6 @@ import com.github.lc.oss.commons.web.services.ETagService;
 
 public class AbstractControllerTest extends AbstractMockTest {
     private static class TestController extends AbstractController {
-
     }
 
     private enum Category implements Message.Category {
@@ -68,20 +67,19 @@ public class AbstractControllerTest extends AbstractMockTest {
 
         ResponseEntity<Response<? extends Jsonable>> result = controller.respond((Message) null);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
+        Assertions.assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
         Assertions.assertNotNull(result.getBody());
         Assertions.assertNull(result.getBody().getBody());
         Assertions.assertNotNull(result.getBody().getMessages());
-        Assertions.assertEquals(1, result.getBody().getMessages().size());
-        Assertions.assertNull(result.getBody().getMessages().iterator().next());
+        Assertions.assertTrue(result.getBody().getMessages().isEmpty());
     }
 
     @Test
     public void test_respond_hasWarnings() {
         AbstractController controller = new TestController();
 
-        Message message1 = new JsonMessage(Category.C, Message.Severities.Info, 1);
-        Message message2 = new JsonMessage(Category.C, Message.Severities.Warning, 1);
+        JsonMessage message1 = new JsonMessage(Category.C, Message.Severities.Info, 1);
+        JsonMessage message2 = new JsonMessage(Category.C, Message.Severities.Warning, 1);
         ResponseEntity<Response<? extends Jsonable>> result = controller.respond(message1, message2);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(HttpStatus.ACCEPTED, result.getStatusCode());
@@ -97,9 +95,9 @@ public class AbstractControllerTest extends AbstractMockTest {
     public void test_respond_hasError() {
         AbstractController controller = new TestController();
 
-        Message message1 = new JsonMessage(Category.C, null, 1);
-        Message message2 = new JsonMessage(Category.C, Message.Severities.Warning, 1);
-        Message message3 = new JsonMessage(Category.C, Message.Severities.Error, 1);
+        JsonMessage message1 = new JsonMessage(Category.C, null, 1);
+        JsonMessage message2 = new JsonMessage(Category.C, Message.Severities.Warning, 1);
+        JsonMessage message3 = new JsonMessage(Category.C, Message.Severities.Error, 1);
         ResponseEntity<Response<? extends Jsonable>> result = controller.respond(message1, message2, message3);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.getStatusCode());
@@ -158,7 +156,7 @@ public class AbstractControllerTest extends AbstractMockTest {
     public void test_respond_emptyCollection() {
         AbstractController controller = new TestController();
 
-        ResponseEntity<Response<JsonableHashSet<Jsonable>>> result = controller.respond(new JsonableHashSet<>());
+        ResponseEntity<Response<JsonableHashSet<Jsonable>>> result = controller.respond(new JsonableHashSet<Jsonable>());
         Assertions.assertNotNull(result);
         Assertions.assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
         Assertions.assertNull(result.getBody());
@@ -284,7 +282,7 @@ public class AbstractControllerTest extends AbstractMockTest {
         Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.getStatusCode());
         Response<JsonMessage> body = response.getBody();
         Assertions.assertNotNull(body);
-        Collection<Message> messages = body.getMessages();
+        JsonableCollection<JsonMessage> messages = body.getMessages();
         Assertions.assertNotNull(messages);
         Assertions.assertEquals(1, messages.size());
         Message message = messages.iterator().next();
@@ -293,7 +291,106 @@ public class AbstractControllerTest extends AbstractMockTest {
         Assertions.assertEquals(Message.Severities.Error, message.getSeverity());
         Assertions.assertEquals(1, message.getNumber());
         Assertions.assertNull(message.getText());
+    }
 
+    @Test
+    public void test_respondMessage() {
+        AbstractController controller = new TestController();
+
+        ResponseEntity<Response<JsonMessage>> response = controller.respondMessage(new JsonMessage(Category.C, Message.Severities.Error, 1));
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.getStatusCode());
+        Response<JsonMessage> body = response.getBody();
+        Assertions.assertNotNull(body);
+        JsonableCollection<JsonMessage> messages = body.getMessages();
+        Assertions.assertNotNull(messages);
+        Assertions.assertEquals(1, messages.size());
+        Message message = messages.iterator().next();
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(Category.C, message.getCategory());
+        Assertions.assertEquals(Message.Severities.Error, message.getSeverity());
+        Assertions.assertEquals(1, message.getNumber());
+        Assertions.assertNull(message.getText());
+    }
+
+    @Test
+    public void test_respond_messageCollection() {
+        AbstractController controller = new TestController();
+
+        Message m1 = new Message() {
+            @Override
+            public Category getCategory() {
+                return AbstractControllerTest.Category.C;
+            }
+
+            @Override
+            public Severity getSeverity() {
+                return Message.Severities.Error;
+            }
+
+            @Override
+            public int getNumber() {
+                return 1;
+            }
+        };
+
+        Message m2 = new Message() {
+            @Override
+            public Category getCategory() {
+                return AbstractControllerTest.Category.C;
+            }
+
+            @Override
+            public Severity getSeverity() {
+                return Message.Severities.Info;
+            }
+
+            @Override
+            public int getNumber() {
+                return 2;
+            }
+        };
+
+        JsonMessage m3 = new JsonMessage(Category.C, Message.Severities.Warning, 3, "junit");
+
+        ResponseEntity<Response<JsonMessage>> response = controller.respond(m1, m2, null, m3);
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.getStatusCode());
+        Response<JsonMessage> body = response.getBody();
+        Assertions.assertNotNull(body);
+        JsonableCollection<JsonMessage> messages = body.getMessages();
+        Assertions.assertNotNull(messages);
+        Assertions.assertEquals(1, messages.size());
+        Message message = messages.iterator().next();
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(Category.C, message.getCategory());
+        Assertions.assertEquals(Message.Severities.Error, message.getSeverity());
+        Assertions.assertEquals(1, message.getNumber());
+        Assertions.assertNull(message.getText());
+    }
+
+    @Test
+    public void test_respond_jsonMessageCollection() {
+        AbstractController controller = new TestController();
+
+        JsonMessage m1 = new JsonMessage(Category.C, Message.Severities.Error, 1);
+        JsonMessage m2 = new JsonMessage(Category.C, Message.Severities.Info, 2);
+        JsonMessage m3 = new JsonMessage(Category.C, Message.Severities.Warning, 3, "junit");
+
+        ResponseEntity<Response<JsonMessage>> response = controller.respond(m1, null, m2, m3);
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.getStatusCode());
+        Response<JsonMessage> body = response.getBody();
+        Assertions.assertNotNull(body);
+        JsonableCollection<JsonMessage> messages = body.getMessages();
+        Assertions.assertNotNull(messages);
+        Assertions.assertEquals(1, messages.size());
+        Message message = messages.iterator().next();
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(Category.C, message.getCategory());
+        Assertions.assertEquals(Message.Severities.Error, message.getSeverity());
+        Assertions.assertEquals(1, message.getNumber());
+        Assertions.assertNull(message.getText());
     }
 
     @Test
@@ -383,5 +480,16 @@ public class AbstractControllerTest extends AbstractMockTest {
         Assertions.assertEquals(Message.Severities.Info, message.getSeverity());
         Assertions.assertEquals(1, message.getNumber());
         Assertions.assertEquals("text value", message.getText());
+    }
+
+    @Test
+    public void test_toMessage_alreadyJsonMessage() {
+        final JsonMessage message = new JsonMessage(Category.C, Message.Severities.Info, 1, "test");
+
+        AbstractController controller = new TestController();
+
+        JsonMessage result = controller.toMessage(message);
+        Assertions.assertSame(message, result);
+        Assertions.assertEquals("test", result.getText());
     }
 }

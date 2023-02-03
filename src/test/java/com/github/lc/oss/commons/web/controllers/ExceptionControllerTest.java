@@ -1,7 +1,6 @@
 package com.github.lc.oss.commons.web.controllers;
 
 import java.io.IOException;
-import java.util.Collection;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +20,8 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import com.github.lc.oss.commons.serialization.JsonMessage;
+import com.github.lc.oss.commons.serialization.JsonableCollection;
 import com.github.lc.oss.commons.serialization.Message;
 import com.github.lc.oss.commons.serialization.Response;
 import com.github.lc.oss.commons.testing.AbstractMockTest;
@@ -66,7 +67,7 @@ public class ExceptionControllerTest extends AbstractMockTest {
         Response<?> response = result.getBody();
         Assertions.assertNotNull(response);
         Assertions.assertNull(response.getBody());
-        Collection<Message> messages = response.getMessages();
+        JsonableCollection<JsonMessage> messages = response.getMessages();
         Assertions.assertNotNull(messages);
         Assertions.assertEquals(1, messages.size());
         Message message = messages.iterator().next();
@@ -85,7 +86,7 @@ public class ExceptionControllerTest extends AbstractMockTest {
         Response<?> response = result.getBody();
         Assertions.assertNotNull(response);
         Assertions.assertNull(response.getBody());
-        Collection<Message> messages = response.getMessages();
+        JsonableCollection<JsonMessage> messages = response.getMessages();
         Assertions.assertNotNull(messages);
         Assertions.assertEquals(1, messages.size());
         Message message = messages.iterator().next();
@@ -164,7 +165,7 @@ public class ExceptionControllerTest extends AbstractMockTest {
         Response<?> response = result.getBody();
         Assertions.assertNotNull(response);
         Assertions.assertNull(response.getBody());
-        Collection<Message> messages = response.getMessages();
+        JsonableCollection<JsonMessage> messages = response.getMessages();
         Assertions.assertNotNull(messages);
         Assertions.assertEquals(1, messages.size());
         Message message = messages.iterator().next();
@@ -183,7 +184,7 @@ public class ExceptionControllerTest extends AbstractMockTest {
         Response<?> response = result.getBody();
         Assertions.assertNotNull(response);
         Assertions.assertNull(response.getBody());
-        Collection<Message> messages = response.getMessages();
+        JsonableCollection<JsonMessage> messages = response.getMessages();
         Assertions.assertNotNull(messages);
         Assertions.assertEquals(1, messages.size());
         Message message = messages.iterator().next();
@@ -202,7 +203,7 @@ public class ExceptionControllerTest extends AbstractMockTest {
         Response<?> response = result.getBody();
         Assertions.assertNotNull(response);
         Assertions.assertNull(response.getBody());
-        Collection<Message> messages = response.getMessages();
+        JsonableCollection<JsonMessage> messages = response.getMessages();
         Assertions.assertNotNull(messages);
         Assertions.assertEquals(1, messages.size());
         Message message = messages.iterator().next();
@@ -221,7 +222,7 @@ public class ExceptionControllerTest extends AbstractMockTest {
         Response<?> response = result.getBody();
         Assertions.assertNotNull(response);
         Assertions.assertNull(response.getBody());
-        Collection<Message> messages = response.getMessages();
+        JsonableCollection<JsonMessage> messages = response.getMessages();
         Assertions.assertNotNull(messages);
         Assertions.assertEquals(1, messages.size());
         Message message = messages.iterator().next();
@@ -240,7 +241,7 @@ public class ExceptionControllerTest extends AbstractMockTest {
         Response<?> response = result.getBody();
         Assertions.assertNotNull(response);
         Assertions.assertNull(response.getBody());
-        Collection<Message> messages = response.getMessages();
+        JsonableCollection<JsonMessage> messages = response.getMessages();
         Assertions.assertNotNull(messages);
         Assertions.assertEquals(1, messages.size());
         Message message = messages.iterator().next();
