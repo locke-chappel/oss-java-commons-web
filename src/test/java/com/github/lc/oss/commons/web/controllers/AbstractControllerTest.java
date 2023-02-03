@@ -359,7 +359,25 @@ public class AbstractControllerTest extends AbstractMockTest {
 
         Mockito.when(l10n.getText(Locale.GERMAN, "messages.C.Info.1", var)).thenReturn("text value");
 
-        Message message = controller.toMessage(Category.C, Message.Severities.Info, 1, var);
+        Message src = new Message() {
+            @Override
+            public Category getCategory() {
+                return AbstractControllerTest.Category.C;
+            }
+
+            @Override
+            public Severity getSeverity() {
+                return Message.Severities.Info;
+            }
+
+            @Override
+            public int getNumber() {
+                return 1;
+            }
+
+        };
+
+        Message message = controller.toMessage(src, var);
         Assertions.assertNotNull(message);
         Assertions.assertEquals(Category.C, message.getCategory());
         Assertions.assertEquals(Message.Severities.Info, message.getSeverity());

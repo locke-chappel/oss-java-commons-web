@@ -137,6 +137,10 @@ public abstract class AbstractController {
         return new ResponseEntity<>(content, responseHeaders, HttpStatus.OK);
     }
 
+    protected Message toMessage(Message message, Variable... vars) {
+        return this.toMessage(message.getCategory(), message.getSeverity(), message.getNumber(), vars);
+    }
+
     protected Message toMessage(Message.Category category, Message.Severity severity, int number, Variable... vars) {
         String text = null;
         if (this.getL10n() != null) {
