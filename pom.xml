@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>com.github.locke-chappel.oss.commons</groupId>
+        <groupId>io.github.locke-chappel.oss.commons</groupId>
         <artifactId>parent</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -152,15 +152,15 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>
-                        --add-opens com.github.lc.oss.commons.web/com.github.lc.oss.commons.web.advice=ALL-UNNAMED
-                        --add-opens com.github.lc.oss.commons.web/com.github.lc.oss.commons.web.annotations=ALL-UNNAMED
-                        --add-opens com.github.lc.oss.commons.web/com.github.lc.oss.commons.web.controllers=ALL-UNNAMED
-                        --add-opens com.github.lc.oss.commons.web/com.github.lc.oss.commons.web.config=ALL-UNNAMED
-                        --add-opens com.github.lc.oss.commons.web/com.github.lc.oss.commons.web.filters=ALL-UNNAMED
-                        --add-opens com.github.lc.oss.commons.web/com.github.lc.oss.commons.web.service=ALL-UNNAMED
-                        --add-opens com.github.lc.oss.commons.web/com.github.lc.oss.commons.web.tokens=ALL-UNNAMED
-                        --add-opens com.github.lc.oss.commons.web/com.github.lc.oss.commons.web.util=ALL-UNNAMED
-                        --add-opens com.github.lc.oss.commons.l10n/com.github.lc.oss.commons.l10n=com.github.lc.oss.commons.web
+                        --add-opens io.github.lc.oss.commons.web/io.github.lc.oss.commons.web.advice=ALL-UNNAMED
+                        --add-opens io.github.lc.oss.commons.web/io.github.lc.oss.commons.web.annotations=ALL-UNNAMED
+                        --add-opens io.github.lc.oss.commons.web/io.github.lc.oss.commons.web.controllers=ALL-UNNAMED
+                        --add-opens io.github.lc.oss.commons.web/io.github.lc.oss.commons.web.config=ALL-UNNAMED
+                        --add-opens io.github.lc.oss.commons.web/io.github.lc.oss.commons.web.filters=ALL-UNNAMED
+                        --add-opens io.github.lc.oss.commons.web/io.github.lc.oss.commons.web.service=ALL-UNNAMED
+                        --add-opens io.github.lc.oss.commons.web/io.github.lc.oss.commons.web.tokens=ALL-UNNAMED
+                        --add-opens io.github.lc.oss.commons.web/io.github.lc.oss.commons.web.util=ALL-UNNAMED
+                        --add-opens io.github.lc.oss.commons.l10n/io.github.lc.oss.commons.l10n=io.github.lc.oss.commons.web
                         ${JacocoArgs}
                     </argLine>
                 </configuration>
