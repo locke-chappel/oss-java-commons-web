@@ -18,6 +18,7 @@ import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.github.lc.oss.commons.encoding.Encodings;
 import io.github.lc.oss.commons.encryption.config.ConfigKey;
 import io.github.lc.oss.commons.encryption.config.EncryptedConfig;
@@ -115,9 +116,9 @@ public abstract class AbstractConfiguration implements WebMvcConfigurer {
         this.configureDefaultPublicAccessUrls(http);
 
         /* Default deny all rule */
-        http.authorizeHttpRequests(). //
-                anyRequest(). //
-                denyAll();
+        http.authorizeHttpRequests((ahr) -> ahr //
+                .anyRequest() //
+                .denyAll());
 
         this.configureDefaultHeaders(http);
     }
@@ -130,11 +131,10 @@ public abstract class AbstractConfiguration implements WebMvcConfigurer {
 
     protected void configureDefaultHeaders(HttpSecurity http) throws Exception {
         /* Spring's CSRF protection is not RESTful */
-        http.csrf().disable();
+        http.csrf((csrf) -> csrf.disable());
 
         /* Disable auto-creation of sessions */
-        http.sessionManagement(). //
-                sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.sessionManagement((sm) -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         /* Add standard security headers */
         http.addFilterAfter(this.securityHeadersFilter(), BasicAuthenticationFilter.class);

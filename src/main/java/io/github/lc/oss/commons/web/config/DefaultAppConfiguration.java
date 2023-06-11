@@ -120,8 +120,8 @@ public class DefaultAppConfiguration extends AbstractConfiguration {
     @Override
     protected void configureDefaultPublicAccessUrls(HttpSecurity http) throws Exception {
         /* Public Access */
-        http.authorizeHttpRequests(). //
-                requestMatchers(this.matchers(HttpMethod.GET, //
+        http.authorizeHttpRequests((ahr) -> ahr //
+                .requestMatchers(this.matchers(HttpMethod.GET, //
                         /* Resources */
                         "^/css$", //
                         "^/favicon.ico$", //
@@ -129,7 +129,7 @@ public class DefaultAppConfiguration extends AbstractConfiguration {
                         "^/js$", //
                         "^/js/[a-zA-Z0-9]+$", //
                         "^/l10n/[a-z]{2}(?:-[A-Z]{2})?/messages.Application.Error.1$"))
-                .permitAll();
+                .permitAll());
     }
 
     @Override
