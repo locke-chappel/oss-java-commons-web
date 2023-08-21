@@ -6,6 +6,7 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -26,7 +27,6 @@ import io.github.lc.oss.commons.serialization.Message;
 import io.github.lc.oss.commons.serialization.Response;
 import io.github.lc.oss.commons.web.config.Authorities;
 import io.github.lc.oss.commons.web.util.ContextUtil;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -44,7 +44,7 @@ public class ExceptionController extends AbstractController {
 
     @ExceptionHandler(value = { Exception.class, RuntimeException.class })
     @ResponseBody
-    public ResponseEntity<Response<?>> catchException(HttpServletRequest request, HttpServletResponse response, Exception exception) {
+    public ResponseEntity<?> catchException(HttpServletRequest request, HttpServletResponse response, Exception exception) {
         HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
 
         Throwable ex = this.getCause(exception);
@@ -76,7 +76,13 @@ public class ExceptionController extends AbstractController {
         } else {
             this.getLogger().error("Unhandled exception", ex);
         }
-        return new ResponseEntity<>(new Response<>(new JsonableHashSet<>(Arrays.asList(this.getErrorMessage()))), status);
+
+        String header = request.getHeader(HttpHeaders.ACCEPT);
+        if (header == null || header.toLowerCase().contains("json")) {
+            return new ResponseEntity<>(new Response<>(new JsonableHashSet<>(Arrays.asList(this.getErrorMessage()))), status);
+        } else {
+            return new ResponseEntity<>(status);
+        }
     }
 
     private Throwable getCause(Throwable ex) {

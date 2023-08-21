@@ -9,8 +9,10 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -60,10 +62,10 @@ public class ExceptionControllerTest extends AbstractMockTest {
     public void test_catchException_null() {
         Exception ex = null;
 
-        ResponseEntity<Response<?>> result = this.controller.catchException(this.request, this.response, ex);
+        ResponseEntity<?> result = this.controller.catchException(this.request, this.response, ex);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.getStatusCode());
-        Response<?> response = result.getBody();
+        Response<?> response = (Response<?>) result.getBody();
         Assertions.assertNotNull(response);
         Assertions.assertNull(response.getBody());
         JsonableCollection<JsonMessage> messages = response.getMessages();
@@ -76,13 +78,46 @@ public class ExceptionControllerTest extends AbstractMockTest {
     }
 
     @Test
+    public void test_catchException_null_withJsonHeader() {
+        Exception ex = null;
+
+        Mockito.when(this.request.getHeader(HttpHeaders.ACCEPT)).thenReturn(MediaType.APPLICATION_JSON_VALUE.toUpperCase());
+
+        ResponseEntity<?> result = this.controller.catchException(this.request, this.response, ex);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.getStatusCode());
+        Response<?> response = (Response<?>) result.getBody();
+        Assertions.assertNotNull(response);
+        Assertions.assertNull(response.getBody());
+        JsonableCollection<JsonMessage> messages = response.getMessages();
+        Assertions.assertNotNull(messages);
+        Assertions.assertEquals(1, messages.size());
+        Message message = messages.iterator().next();
+        Assertions.assertEquals(Message.Categories.Application, message.getCategory());
+        Assertions.assertEquals(Message.Severities.Error, message.getSeverity());
+        Assertions.assertEquals(1, message.getNumber());
+    }
+
+    @Test
+    public void test_catchException_null_withImageHeader() {
+        Exception ex = null;
+
+        Mockito.when(this.request.getHeader(HttpHeaders.ACCEPT)).thenReturn(MediaType.IMAGE_PNG_VALUE);
+
+        ResponseEntity<?> result = this.controller.catchException(this.request, this.response, ex);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.getStatusCode());
+        Assertions.assertNull(result.getBody());
+    }
+
+    @Test
     public void test_catchException_unhandledType() {
         Exception ex = new SelfRootedException();
 
-        ResponseEntity<Response<?>> result = this.controller.catchException(this.request, this.response, ex);
+        ResponseEntity<?> result = this.controller.catchException(this.request, this.response, ex);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.getStatusCode());
-        Response<?> response = result.getBody();
+        Response<?> response = (Response<?>) result.getBody();
         Assertions.assertNotNull(response);
         Assertions.assertNull(response.getBody());
         JsonableCollection<JsonMessage> messages = response.getMessages();
@@ -101,7 +136,7 @@ public class ExceptionControllerTest extends AbstractMockTest {
 
         Exception ex = new RuntimeException("boom", new AccessDeniedException("nope"));
 
-        ResponseEntity<Response<?>> result = this.controller.catchException(this.request, this.response, ex);
+        ResponseEntity<?> result = this.controller.catchException(this.request, this.response, ex);
         Assertions.assertNull(result);
     }
 
@@ -128,7 +163,7 @@ public class ExceptionControllerTest extends AbstractMockTest {
         }
 
         Assertions.assertFalse(helper.wasCalled);
-        ResponseEntity<Response<?>> result = controller.catchException(this.request, this.response, ex);
+        ResponseEntity<?> result = controller.catchException(this.request, this.response, ex);
         Assertions.assertNull(result);
         Assertions.assertTrue(helper.wasCalled);
     }
@@ -150,7 +185,7 @@ public class ExceptionControllerTest extends AbstractMockTest {
 
         Exception ex = new AccessDeniedException("nope");
 
-        ResponseEntity<Response<?>> result = this.controller.catchException(this.request, this.response, ex);
+        ResponseEntity<?> result = this.controller.catchException(this.request, this.response, ex);
         Assertions.assertNull(result);
     }
 
@@ -158,10 +193,10 @@ public class ExceptionControllerTest extends AbstractMockTest {
     public void test_catchException_badRequest() {
         Exception ex = new HttpMessageNotReadableException("boom", (HttpInputMessage) null);
 
-        ResponseEntity<Response<?>> result = this.controller.catchException(this.request, this.response, ex);
+        ResponseEntity<?> result = this.controller.catchException(this.request, this.response, ex);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.getStatusCode());
-        Response<?> response = result.getBody();
+        Response<?> response = (Response<?>) result.getBody();
         Assertions.assertNotNull(response);
         Assertions.assertNull(response.getBody());
         JsonableCollection<JsonMessage> messages = response.getMessages();
@@ -177,10 +212,10 @@ public class ExceptionControllerTest extends AbstractMockTest {
     public void test_catchException_methodNotSupported() {
         Exception ex = new HttpRequestMethodNotSupportedException("boom");
 
-        ResponseEntity<Response<?>> result = this.controller.catchException(this.request, this.response, ex);
+        ResponseEntity<?> result = this.controller.catchException(this.request, this.response, ex);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(HttpStatus.METHOD_NOT_ALLOWED, result.getStatusCode());
-        Response<?> response = result.getBody();
+        Response<?> response = (Response<?>) result.getBody();
         Assertions.assertNotNull(response);
         Assertions.assertNull(response.getBody());
         JsonableCollection<JsonMessage> messages = response.getMessages();
@@ -196,10 +231,10 @@ public class ExceptionControllerTest extends AbstractMockTest {
     public void test_catchException_unsupportedMediaType() {
         Exception ex = new HttpMediaTypeNotSupportedException("boom");
 
-        ResponseEntity<Response<?>> result = this.controller.catchException(this.request, this.response, ex);
+        ResponseEntity<?> result = this.controller.catchException(this.request, this.response, ex);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(HttpStatus.UNSUPPORTED_MEDIA_TYPE, result.getStatusCode());
-        Response<?> response = result.getBody();
+        Response<?> response = (Response<?>) result.getBody();
         Assertions.assertNotNull(response);
         Assertions.assertNull(response.getBody());
         JsonableCollection<JsonMessage> messages = response.getMessages();
@@ -215,10 +250,10 @@ public class ExceptionControllerTest extends AbstractMockTest {
     public void test_catchException_notAcceptable() {
         Exception ex = new HttpMediaTypeNotAcceptableException("boom");
 
-        ResponseEntity<Response<?>> result = this.controller.catchException(this.request, this.response, ex);
+        ResponseEntity<?> result = this.controller.catchException(this.request, this.response, ex);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(HttpStatus.NOT_ACCEPTABLE, result.getStatusCode());
-        Response<?> response = result.getBody();
+        Response<?> response = (Response<?>) result.getBody();
         Assertions.assertNotNull(response);
         Assertions.assertNull(response.getBody());
         JsonableCollection<JsonMessage> messages = response.getMessages();
@@ -234,10 +269,10 @@ public class ExceptionControllerTest extends AbstractMockTest {
     public void test_catchException_notFound() {
         Exception ex = new NoHandlerFoundException(null, null, null);
 
-        ResponseEntity<Response<?>> result = this.controller.catchException(this.request, this.response, ex);
+        ResponseEntity<?> result = this.controller.catchException(this.request, this.response, ex);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
-        Response<?> response = result.getBody();
+        Response<?> response = (Response<?>) result.getBody();
         Assertions.assertNotNull(response);
         Assertions.assertNull(response.getBody());
         JsonableCollection<JsonMessage> messages = response.getMessages();
