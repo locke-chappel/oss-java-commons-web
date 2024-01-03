@@ -12,6 +12,7 @@ import org.springframework.security.authorization.AuthorizationEventPublisher;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
 
 import io.github.lc.oss.commons.l10n.L10N;
 import io.github.lc.oss.commons.testing.AbstractMockTest;
@@ -60,6 +61,7 @@ public class DefaultAppConfigurationTest extends AbstractMockTest {
         AuthenticationManagerBuilder authenticationBuilder = Mockito.mock(AuthenticationManagerBuilder.class);
         ApplicationContext context = Mockito.mock(ApplicationContext.class);
         Mockito.when(context.getBeanNamesForType(AuthorizationEventPublisher.class)).thenReturn(new String[0]);
+        Mockito.when(context.getBeanNamesForType(GrantedAuthorityDefaults.class)).thenReturn(new String[0]);
 
         HttpSecurity http = new HttpSecurity(objectPostProcessor, authenticationBuilder, new HashMap<>());
         http.setSharedObject(ApplicationContext.class, context);
@@ -81,6 +83,7 @@ public class DefaultAppConfigurationTest extends AbstractMockTest {
         AuthenticationManagerBuilder authenticationBuilder = Mockito.mock(AuthenticationManagerBuilder.class);
         ApplicationContext context = Mockito.mock(ApplicationContext.class);
         Mockito.when(context.getBeanNamesForType(AuthorizationEventPublisher.class)).thenReturn(new String[0]);
+        Mockito.when(context.getBeanNamesForType(GrantedAuthorityDefaults.class)).thenReturn(new String[0]);
 
         HttpSecurity http = new HttpSecurity(objectPostProcessor, authenticationBuilder, new HashMap<>());
         http.setSharedObject(ApplicationContext.class, context);
