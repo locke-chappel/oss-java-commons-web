@@ -12,6 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import io.github.lc.oss.commons.testing.AbstractMockTest;
@@ -104,4 +105,19 @@ public class HttpServiceTest extends AbstractMockTest {
         Assertions.assertEquals(HttpService.DEFAULT_TIMEOUT, this.service.getTimeout());
     }
 
+    @Test
+    public void test_customErrorHandler() {
+        final ResponseErrorHandler errorHandler = Mockito.mock(ResponseErrorHandler.class);
+
+        HttpService test = new HttpService() {
+            @Override
+            protected ResponseErrorHandler getCustomResponseErrorHandler() {
+                return errorHandler;
+            }
+        };
+
+        RestTemplate template = test.createRestTemplate();
+        Assertions.assertNotNull(template);
+        Assertions.assertSame(errorHandler, template.getErrorHandler());
+    }
 }

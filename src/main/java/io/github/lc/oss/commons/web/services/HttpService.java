@@ -10,6 +10,7 @@ import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.core5.http.io.SocketConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,12 +18,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 public class HttpService {
     private static final StringHttpMessageConverter UTF_8_CONVERTER = new StringHttpMessageConverter(StandardCharsets.UTF_8);
 
     protected static final int DEFAULT_TIMEOUT = 30 * 1000;
+
+    @Autowired(required = false)
+    private CustomResponseErrorHandler customResponseErrorHandler;
 
     public <T> ResponseEntity<T> call(HttpMethod method, String url, Map<String, String> headers, Class<T> responseType, Object body) {
         HttpHeaders requestHeaders = new HttpHeaders();
@@ -64,6 +69,10 @@ public class HttpService {
 
     protected RestTemplate createRestTemplate() {
         RestTemplate rest = new RestTemplate();
+        ResponseErrorHandler errorHandler = this.getCustomResponseErrorHandler();
+        if (errorHandler != null) {
+            rest.setErrorHandler(errorHandler);
+        }
         ClientHttpRequestFactory factory = this.createRequestFactory();
         if (factory != null) {
             rest.setRequestFactory(factory);
@@ -79,5 +88,9 @@ public class HttpService {
 
     public int getTimeout() {
         return HttpService.DEFAULT_TIMEOUT;
+    }
+
+    protected ResponseErrorHandler getCustomResponseErrorHandler() {
+        return this.customResponseErrorHandler;
     }
 }
