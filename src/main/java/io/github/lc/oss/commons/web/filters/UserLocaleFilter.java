@@ -32,7 +32,7 @@ public class UserLocaleFilter implements Filter {
             if (header != null && !header.trim().equals("")) {
                 List<Locale.LanguageRange> acceptedLanguages = Locale.LanguageRange.parse(header);
                 Locale match = acceptedLanguages.stream(). //
-                        map(l -> new Locale(l.getRange())). //
+                        map(l -> Locale.forLanguageTag(l.getRange())). //
                         filter(l -> this.getL10n().hasLocale(l)). //
                         findFirst(). //
                         orElse(null);

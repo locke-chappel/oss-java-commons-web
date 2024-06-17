@@ -380,7 +380,7 @@ public class ResourceController extends AbstractResourceResolver {
     protected ResponseEntity<PrimitiveMap<String>> getL10n(WebRequest request, String localeName, String prefix) {
         Locale locale = null;
         if (localeName != null && !localeName.trim().equals("")) {
-            locale = new Locale(localeName.replace("-", "_"));
+            locale = Locale.forLanguageTag(localeName.replace("-", "_"));
         }
         return this.getL10n(request, locale, prefix);
     }
