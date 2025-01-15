@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.core.env.Environment;
-import org.springframework.security.config.annotation.ObjectPostProcessor;
+import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
@@ -24,8 +24,7 @@ public class AbstractConfigurationTest extends AbstractMockTest {
 
     private static class TestSecure extends EncryptedConfig {
         private enum TestKeys implements ConfigKey {
-            Key1,
-            Key2;
+            Key1, Key2;
 
             @Override
             public Class<?> type() {
@@ -79,7 +78,8 @@ public class AbstractConfigurationTest extends AbstractMockTest {
         AbstractConfiguration config = new TestConfig();
 
         @SuppressWarnings("unchecked")
-        HttpSecurity http = new HttpSecurity(Mockito.mock(ObjectPostProcessor.class), Mockito.mock(AuthenticationManagerBuilder.class), new HashMap<>());
+        HttpSecurity http = new HttpSecurity(Mockito.mock(ObjectPostProcessor.class),
+                Mockito.mock(AuthenticationManagerBuilder.class), new HashMap<>());
 
         try {
             config.configureDefaultPublicAccessUrls(http);
@@ -149,7 +149,8 @@ public class AbstractConfigurationTest extends AbstractMockTest {
 
         Environment env = Mockito.mock(Environment.class);
         Mockito.when(env.getProperty("knative", Boolean.class, Boolean.FALSE)).thenReturn(true);
-        Mockito.when(env.getProperty("CONFIG", "")).thenReturn(Encodings.Base64.encode("{\"Key1\" : \"knative\", \"Key2\" : 100 }"));
+        Mockito.when(env.getProperty("CONFIG", ""))
+                .thenReturn(Encodings.Base64.encode("{\"Key1\" : \"knative\", \"Key2\" : 100 }"));
 
         TestSecure result = config.loadEncryptedConfig(env, TestSecure.TestKeys.values(), TestSecure.class);
         Assertions.assertNotNull(result);

@@ -17,7 +17,8 @@ public class SecurityHeadersFilter extends OncePerRequestFilter {
     private Map<String, String> defaultHeaders;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         this.getHeaders().entrySet().stream().forEach(e -> {
             Collection<String> existing = response.getHeaders(e.getKey());
             if (existing == null || existing.isEmpty()) {
@@ -44,9 +45,9 @@ public class SecurityHeadersFilter extends OncePerRequestFilter {
             /* OWASP - Content Security Policy */
             map.put("Content-Security-Policy", "default-src 'none'; script-src 'self'; " + //
                     "connect-src 'self'" + cors + "; img-src 'self'; style-src 'self'; " + //
-                    "font-src 'self'; frame-ancestors 'none';");
+                    "font-src 'self'; frame-ancestors 'none'; form-action 'none';");
 
-            /* OWASP Prevent browsers from guessing at media types */
+            /* OWASP - Prevent browsers from guessing at media types */
             map.put("X-Content-Type-Options", "nosniff");
 
             /* OWASP - Clickjacking (prevents loading in frames) */
@@ -55,14 +56,17 @@ public class SecurityHeadersFilter extends OncePerRequestFilter {
             /* OWASP - disable cross domain policies */
             map.put("X-Permitted-Cross-Domain-Policies", "none");
 
-            /* OWASP Referrer Policy */
+            /* OWASP - Referrer Policy */
             map.put("Referrer-Policy", "no-referrer");
 
-            /*
-             * OWASP - Modern designs say this should now be disabled, values of 1 etc.
-             * actually create issues
-             */
-            map.put("X-XSS-Protection", "0");
+            /* OWASP - Prevent access to site from opener context */
+            map.put("Cross-Origin-Opener-Policy", "same-origin");
+
+            /* OWASP - Prevent loading cross-origin resources unless explicitly permitted */
+            map.put("Cross-Origin-Embedder-Policy", "require-corp");
+
+            /* OWASP - Restrict resource loading to same origin */
+            map.put("Cross-Origin-Resource-Policy", "same-origin");
 
             this.defaultHeaders = Collections.unmodifiableMap(map);
         }

@@ -75,10 +75,13 @@ public class SecurityHeadersFilterTest extends AbstractMockTest {
 
         Assertions.assertEquals("default-src 'none'; script-src 'self'; " + //
                 "connect-src 'self'; img-src 'self'; style-src 'self'; " + //
-                "font-src 'self'; frame-ancestors 'none';", result.get("Content-Security-Policy"));
+                "font-src 'self'; frame-ancestors 'none'; form-action 'none';", result.get("Content-Security-Policy"));
         Assertions.assertEquals("nosniff", result.get("X-Content-Type-Options"));
         Assertions.assertEquals("deny", result.get("X-Frame-Options"));
-        Assertions.assertEquals("0", result.get("X-XSS-Protection"));
+        Assertions.assertEquals("same-origin", result.get("Cross-Origin-Opener-Policy"));
+        Assertions.assertEquals("require-corp", result.get("Cross-Origin-Embedder-Policy"));
+        Assertions.assertEquals("same-origin", result.get("Cross-Origin-Resource-Policy"));
+        Assertions.assertNull(result.get("X-XSS-Protection"));
     }
 
     @Test
@@ -97,10 +100,13 @@ public class SecurityHeadersFilterTest extends AbstractMockTest {
 
         Assertions.assertEquals("default-src 'none'; script-src 'self'; " + //
                 "connect-src 'self'; img-src 'self'; style-src 'self'; " + //
-                "font-src 'self'; frame-ancestors 'none';", result.get("Content-Security-Policy"));
+                "font-src 'self'; frame-ancestors 'none'; form-action 'none';", result.get("Content-Security-Policy"));
         Assertions.assertEquals("nosniff", result.get("X-Content-Type-Options"));
         Assertions.assertEquals("deny", result.get("X-Frame-Options"));
-        Assertions.assertEquals("0", result.get("X-XSS-Protection"));
+        Assertions.assertEquals("same-origin", result.get("Cross-Origin-Opener-Policy"));
+        Assertions.assertEquals("require-corp", result.get("Cross-Origin-Embedder-Policy"));
+        Assertions.assertEquals("same-origin", result.get("Cross-Origin-Resource-Policy"));
+        Assertions.assertNull(result.get("X-XSS-Protection"));
     }
 
     @Test
@@ -117,10 +123,13 @@ public class SecurityHeadersFilterTest extends AbstractMockTest {
 
         Assertions.assertEquals("default-src 'none'; script-src 'self'; " + //
                 "connect-src 'self'; img-src 'self'; style-src 'self'; " + //
-                "font-src 'self'; frame-ancestors 'none';", result.get("Content-Security-Policy"));
+                "font-src 'self'; frame-ancestors 'none'; form-action 'none';", result.get("Content-Security-Policy"));
         Assertions.assertEquals("nosniff", result.get("X-Content-Type-Options"));
         Assertions.assertEquals("deny", result.get("X-Frame-Options"));
-        Assertions.assertEquals("0", result.get("X-XSS-Protection"));
+        Assertions.assertEquals("same-origin", result.get("Cross-Origin-Opener-Policy"));
+        Assertions.assertEquals("require-corp", result.get("Cross-Origin-Embedder-Policy"));
+        Assertions.assertEquals("same-origin", result.get("Cross-Origin-Resource-Policy"));
+        Assertions.assertNull(result.get("X-XSS-Protection"));
     }
 
     @Test
@@ -137,9 +146,12 @@ public class SecurityHeadersFilterTest extends AbstractMockTest {
 
         Assertions.assertEquals("default-src 'none'; script-src 'self'; " + //
                 "connect-src 'self' http://localhost:8080; img-src 'self'; style-src 'self'; " + //
-                "font-src 'self'; frame-ancestors 'none';", result.get("Content-Security-Policy"));
+                "font-src 'self'; frame-ancestors 'none'; form-action 'none';", result.get("Content-Security-Policy"));
         Assertions.assertEquals("nosniff", result.get("X-Content-Type-Options"));
         Assertions.assertEquals("deny", result.get("X-Frame-Options"));
-        Assertions.assertEquals("0", result.get("X-XSS-Protection"));
+        Assertions.assertEquals("same-origin", result.get("Cross-Origin-Opener-Policy"));
+        Assertions.assertEquals("require-corp", result.get("Cross-Origin-Embedder-Policy"));
+        Assertions.assertEquals("same-origin", result.get("Cross-Origin-Resource-Policy"));
+        Assertions.assertNull(result.get("X-XSS-Protection"));
     }
 }
