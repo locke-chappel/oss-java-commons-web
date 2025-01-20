@@ -13,23 +13,25 @@ import org.springframework.aot.hint.TypeReference;
 
 public abstract class AbstractRuntimeHintsRegistrar implements RuntimeHintsRegistrar {
     private static final Set<TypeReference> NO_REFLECTIONS = Collections.unmodifiableSet(new HashSet<>(0));
-    private static final Set<TypeReference> DEFAULT_REFLECTIONS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList( //
-            TypeReference.of(io.github.lc.oss.commons.util.PathNormalizer.class), //
-            TypeReference.of(io.github.lc.oss.commons.web.advice.AbstractControllerAdvice.class), //
-            TypeReference.of(io.github.lc.oss.commons.web.advice.AbstractSystemIdentityAdvice.class), //
-            TypeReference.of(io.github.lc.oss.commons.web.advice.CommonAdvice.class), //
-            TypeReference.of(io.github.lc.oss.commons.web.advice.ETagAdvice.class), //
-            TypeReference.of(io.github.lc.oss.commons.web.annotations.SystemIdentity.class), //
-            TypeReference.of(io.github.lc.oss.commons.web.annotations.HttpCachable.class), //
-            TypeReference.of(org.springframework.stereotype.Controller.class), //
-            TypeReference.of(org.springframework.web.bind.annotation.RestController.class), //
-            TypeReference.of(org.springframework.web.bind.annotation.RequestMapping.class), //
-            TypeReference.of(org.springframework.web.bind.annotation.GetMapping.class), //
-            TypeReference.of(org.springframework.web.bind.annotation.PostMapping.class), //
-            TypeReference.of(org.springframework.web.bind.annotation.PatchMapping.class), //
-            TypeReference.of(org.springframework.web.bind.annotation.PutMapping.class), //
-            TypeReference.of(org.springframework.web.bind.annotation.DeleteMapping.class) //
-    )));
+    private static final Set<TypeReference> DEFAULT_REFLECTIONS = Collections
+            .unmodifiableSet(new HashSet<>(Arrays.asList( //
+                    TypeReference.of(io.github.lc.oss.commons.util.PathNormalizer.class), //
+                    TypeReference.of(io.github.lc.oss.commons.web.advice.AbstractControllerAdvice.class), //
+                    TypeReference.of(io.github.lc.oss.commons.web.advice.AbstractSystemIdentityAdvice.class), //
+                    TypeReference.of(io.github.lc.oss.commons.web.advice.CommonAdvice.class), //
+                    TypeReference.of(io.github.lc.oss.commons.web.advice.ETagAdvice.class), //
+                    TypeReference.of(io.github.lc.oss.commons.web.annotations.SystemIdentity.class), //
+                    TypeReference.of(io.github.lc.oss.commons.web.annotations.HttpCachable.class), //
+                    TypeReference.of(org.springframework.stereotype.Controller.class), //
+                    TypeReference.of(org.springframework.web.bind.annotation.RestController.class), //
+                    TypeReference.of(org.springframework.web.bind.annotation.RequestMapping.class), //
+                    TypeReference.of(org.springframework.web.bind.annotation.GetMapping.class), //
+                    TypeReference.of(org.springframework.web.bind.annotation.PostMapping.class), //
+                    TypeReference.of(org.springframework.web.bind.annotation.PatchMapping.class), //
+                    TypeReference.of(org.springframework.web.bind.annotation.PutMapping.class), //
+                    TypeReference.of(org.springframework.web.bind.annotation.DeleteMapping.class), //
+                    TypeReference.of("org.springframework.boot.http.client.ClientHttpRequestFactorySettings") //
+            )));
 
     private static final Set<List<TypeReference>> NO_PROXIES = Collections.unmodifiableSet(new HashSet<>(0));
 
