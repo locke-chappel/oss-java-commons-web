@@ -1,7 +1,6 @@
 package io.github.lc.oss.commons.web.util;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,6 +36,15 @@ public class CookieUtilTest extends AbstractMockTest {
         Mockito.when(this.request.getCookies()).thenReturn(new Cookie[] {});
 
         CookieUtil.deleteCookie(this.request, null, null);
+        CookieUtil.deleteCookie(this.request, this.response, null);
+    }
+
+    @Test
+    public void test_deleteCookie_nulls_v3() {
+        Mockito.when(this.request.getCookies()).thenReturn(new Cookie[] { new Cookie("junit-other", "junit-value") });
+
+        CookieUtil.deleteCookie(this.request, null, null);
+        CookieUtil.deleteCookie(this.request, this.response, null);
     }
 
     @Test
@@ -61,7 +69,8 @@ public class CookieUtilTest extends AbstractMockTest {
 
     @Test
     public void test_deleteCookie_found() {
-        Cookie[] cookies = new Cookie[] { new Cookie("junit-other", "junit-value"), new Cookie("junit-cookie", "value-junit") };
+        Cookie[] cookies = new Cookie[] { new Cookie("junit-other", "junit-value"),
+                new Cookie("junit-cookie", "value-junit") };
 
         final Helper addCookie = new Helper();
 
@@ -82,34 +91,163 @@ public class CookieUtilTest extends AbstractMockTest {
     }
 
     @Test
-    public void test_deleteCookies_nulls() {
+    public void test_deleteAllCookies_nulls() {
         Mockito.when(this.request.getCookies()).thenReturn(null);
 
-        CookieUtil.deleteCookies(null, null, null);
-        CookieUtil.deleteCookies(this.request, null, null);
-        CookieUtil.deleteCookies(this.request, this.response, null);
+        CookieUtil.deleteAllCookies(null, null, (Set<String>) null);
+        CookieUtil.deleteAllCookies(this.request, null, (Set<String>) null);
+        CookieUtil.deleteAllCookies(this.request, this.response, (Set<String>) null);
     }
 
     @Test
-    public void test_deleteCookies_nulls_v2() {
+    public void test_deleteAllCookies_nulls_v2() {
         Mockito.when(this.request.getCookies()).thenReturn(new Cookie[] {});
 
-        CookieUtil.deleteCookies(this.request, null, null);
+        CookieUtil.deleteAllCookies(this.request, null, (Set<String>) null);
+        CookieUtil.deleteAllCookies(this.request, this.response, (Set<String>) null);
     }
 
     @Test
-    public void test_deleteCookies_noCookies() {
+    public void test_deleteAllCookies_nulls_v3() {
+        Mockito.when(this.request.getCookies()).thenReturn(new Cookie[] { new Cookie("junit-cookie", "value-junit") });
+
+        CookieUtil.deleteAllCookies(this.request, null, (Set<String>) null);
+        CookieUtil.deleteAllCookies(this.request, this.response, (Set<String>) null);
+    }
+
+    @Test
+    public void test_deleteAllCookies_noCookies() {
         Cookie[] cookies = new Cookie[] {};
 
         Mockito.when(this.request.getCookies()).thenReturn(cookies);
         Mockito.verify(this.response, Mockito.never()).addCookie(ArgumentMatchers.any());
 
-        CookieUtil.deleteCookies(this.request, this.response);
+        CookieUtil.deleteAllCookies(this.request, this.response);
     }
 
     @Test
-    public void test_deleteCookies() {
-        Cookie[] cookies = new Cookie[] { new Cookie("junit-other", "junit-value"), new Cookie("junit-cookie", "value-junit") };
+    public void test_deleteAllCookies() {
+        Cookie[] cookies = new Cookie[] { new Cookie("junit-other", "junit-value"),
+                new Cookie("junit-cookie", "value-junit") };
+
+        final Helper otherDeleted = new Helper();
+        final Helper cookieDeleted = new Helper();
+
+        Mockito.when(this.request.getCookies()).thenReturn(cookies);
+        Mockito.doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                Cookie cookie = (Cookie) invocation.getArgument(0);
+                switch (cookie.getName()) {
+                    case "junit-other":
+                        Assertions.assertFalse(otherDeleted.wasCalled);
+                        otherDeleted.wasCalled = true;
+                        break;
+                    case "junit-cookie":
+                        Assertions.assertFalse(cookieDeleted.wasCalled);
+                        cookieDeleted.wasCalled = true;
+                        break;
+                    default:
+                        Assertions.fail("Unexpected cookie: " + cookie.getName());
+                }
+                Assertions.assertEquals(0, cookie.getMaxAge());
+                return null;
+            }
+        }).when(this.response).addCookie(ArgumentMatchers.notNull());
+
+        Assertions.assertFalse(otherDeleted.wasCalled);
+        Assertions.assertFalse(cookieDeleted.wasCalled);
+
+        CookieUtil.deleteAllCookies(this.request, this.response, (Set<String>) null);
+
+        Assertions.assertTrue(otherDeleted.wasCalled);
+        Assertions.assertTrue(cookieDeleted.wasCalled);
+    }
+
+    @Test
+    public void test_deleteAllCookies_v2() {
+        Cookie[] cookies = new Cookie[] { new Cookie("junit-other", "junit-value"),
+                new Cookie("junit-cookie", "value-junit") };
+
+        final Helper otherDeleted = new Helper();
+        final Helper cookieDeleted = new Helper();
+
+        Mockito.when(this.request.getCookies()).thenReturn(cookies);
+        Mockito.doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                Cookie cookie = (Cookie) invocation.getArgument(0);
+                switch (cookie.getName()) {
+                    case "junit-other":
+                        Assertions.assertFalse(otherDeleted.wasCalled);
+                        otherDeleted.wasCalled = true;
+                        break;
+                    case "junit-cookie":
+                        Assertions.assertFalse(cookieDeleted.wasCalled);
+                        cookieDeleted.wasCalled = true;
+                        break;
+                    default:
+                        Assertions.fail("Unexpected cookie: " + cookie.getName());
+                }
+                Assertions.assertEquals(0, cookie.getMaxAge());
+                return null;
+            }
+        }).when(this.response).addCookie(ArgumentMatchers.notNull());
+
+        Assertions.assertFalse(otherDeleted.wasCalled);
+        Assertions.assertFalse(cookieDeleted.wasCalled);
+
+        CookieUtil.deleteAllCookies(this.request, this.response, (String) null);
+
+        Assertions.assertTrue(otherDeleted.wasCalled);
+        Assertions.assertTrue(cookieDeleted.wasCalled);
+    }
+
+    @Test
+    public void test_deleteAllCookies_v3() {
+        Cookie[] cookies = new Cookie[] { new Cookie("junit-other", "junit-value"),
+                new Cookie("junit-cookie", "value-junit") };
+
+        final Helper otherDeleted = new Helper();
+        final Helper cookieDeleted = new Helper();
+
+        Mockito.when(this.request.getCookies()).thenReturn(cookies);
+        Mockito.doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                Cookie cookie = (Cookie) invocation.getArgument(0);
+                switch (cookie.getName()) {
+                    case "junit-other":
+                        Assertions.assertFalse(otherDeleted.wasCalled);
+                        otherDeleted.wasCalled = true;
+                        break;
+                    case "junit-cookie":
+                        Assertions.assertFalse(cookieDeleted.wasCalled);
+                        cookieDeleted.wasCalled = true;
+                        break;
+                    default:
+                        Assertions.fail("Unexpected cookie: " + cookie.getName());
+                }
+                Assertions.assertEquals(0, cookie.getMaxAge());
+                return null;
+            }
+        }).when(this.response).addCookie(ArgumentMatchers.notNull());
+
+        Assertions.assertFalse(otherDeleted.wasCalled);
+        Assertions.assertFalse(cookieDeleted.wasCalled);
+
+        CookieUtil.deleteAllCookies(this.request, this.response);
+
+        Assertions.assertTrue(otherDeleted.wasCalled);
+        Assertions.assertTrue(cookieDeleted.wasCalled);
+    }
+
+    @Test
+    public void test_deleteAllCookies_exceptOne() {
+        Cookie[] cookies = new Cookie[] { new Cookie("junit-other", "junit-value"),
+                new Cookie("junit-cookie", "value-junit") };
+
+        final Helper otherDeleted = new Helper();
 
         Mockito.when(this.request.getCookies()).thenReturn(cookies);
         Mockito.doAnswer(new Answer<Void>() {
@@ -118,11 +256,16 @@ public class CookieUtilTest extends AbstractMockTest {
                 Cookie cookie = (Cookie) invocation.getArgument(0);
                 Assertions.assertEquals("junit-other", cookie.getName());
                 Assertions.assertEquals(0, cookie.getMaxAge());
+                otherDeleted.wasCalled = true;
                 return null;
             }
         }).when(this.response).addCookie(ArgumentMatchers.notNull());
 
-        CookieUtil.deleteCookies(this.request, this.response, new HashSet<>(Arrays.asList("junit-cookie")));
+        Assertions.assertFalse(otherDeleted.wasCalled);
+
+        CookieUtil.deleteAllCookies(this.request, this.response, "junit-cookie");
+
+        Assertions.assertTrue(otherDeleted.wasCalled);
     }
 
     @Test

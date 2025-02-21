@@ -1,6 +1,5 @@
 package io.github.lc.oss.commons.web.tokens;
 
-import java.util.Arrays;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +9,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
+
 import io.github.lc.oss.commons.encoding.Encodings;
 import io.github.lc.oss.commons.hashing.Hashes;
 import io.github.lc.oss.commons.web.util.CookiePrefixParser;
-
+import io.github.lc.oss.commons.web.util.CookieUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -105,7 +105,8 @@ public class StatelessCsrfTokenManager implements CsrfTokenManager {
         csrfCookie.setMaxAge(StatelessCsrfTokenManager.TTL_COOKIE);
         response.addCookie(csrfCookie);
 
-        Cookie headerCookie = new Cookie(this.getHeaderCookieId(), Hashes.SHA2_256.hash(this.getSalt() + json, Encodings.Base64));
+        Cookie headerCookie = new Cookie(this.getHeaderCookieId(),
+                Hashes.SHA2_256.hash(this.getSalt() + json, Encodings.Base64));
         headerCookie.setPath(this.cookiePath);
         headerCookie.setDomain(this.cookieDomain);
         headerCookie.setSecure(this.secureCookies);
@@ -117,10 +118,7 @@ public class StatelessCsrfTokenManager implements CsrfTokenManager {
     @Override
     public boolean isValid(HttpServletRequest request) {
         String header = request.getHeader(StatelessCsrfTokenManager.CSRF_HEADER_ID);
-        Cookie cookie = request.getCookies() == null ? null : Arrays.stream(request.getCookies()). //
-                filter(c -> this.getCookieId().equals(c.getName())). //
-                findAny(). //
-                orElse(null);
+        Cookie cookie = request.getCookies() == null ? null : CookieUtil.getCookie(request, this.getCookieId());
         if (cookie == null || header == null) {
             return false;
         }
