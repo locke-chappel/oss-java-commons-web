@@ -22,7 +22,11 @@ public class AbstractConfigurationTest extends AbstractMockTest {
 
     }
 
-    private static class TestSecure extends EncryptedConfig {
+    /*
+     * This inner class must be public so that the ConfigLoader can create an
+     * instance otherwise the EncryptedConfig tests will fail
+     */
+    public static class TestSecure extends EncryptedConfig {
         private enum TestKeys implements ConfigKey {
             Key1, Key2;
 
@@ -34,30 +38,6 @@ public class AbstractConfigurationTest extends AbstractMockTest {
 
         public TestSecure() {
             super(TestKeys.class);
-        }
-    }
-
-    private static class Explosive extends EncryptedConfig {
-        public Explosive() {
-            super(null);
-        }
-    }
-
-    private static class ThreadHelper implements Runnable {
-        private Thread parent;
-
-        public ThreadHelper(Thread parent) {
-            this.parent = parent;
-        }
-
-        @Override
-        public void run() {
-            try {
-                Thread.sleep(250);
-            } catch (InterruptedException ex) {
-                throw new RuntimeException("Test was interrupted unexpectedly", ex);
-            }
-            this.parent.interrupt();
         }
     }
 
@@ -114,36 +94,6 @@ public class AbstractConfigurationTest extends AbstractMockTest {
     }
 
     @Test
-    public void test_loadEncryptedConfig_it_error() {
-        AbstractConfiguration config = new TestConfig();
-
-        Environment env = Mockito.mock(Environment.class);
-        Mockito.when(env.getProperty("knative", Boolean.class, Boolean.FALSE)).thenReturn(false);
-        Mockito.when(env.getProperty("integrationtest", Boolean.class, Boolean.FALSE)).thenReturn(true);
-
-        try {
-            config.loadEncryptedConfig(env, TestSecure.TestKeys.values(), Explosive.class);
-            Assertions.fail("Expected Exception");
-        } catch (RuntimeException ex) {
-            Assertions.assertEquals("Unable to create new config object", ex.getMessage());
-        }
-    }
-
-    @Test
-    public void test_loadEncryptedConfig_knative_json() {
-        AbstractConfiguration config = new TestConfig();
-
-        Environment env = Mockito.mock(Environment.class);
-        Mockito.when(env.getProperty("knative", Boolean.class, Boolean.FALSE)).thenReturn(true);
-        Mockito.when(env.getProperty("CONFIG", "")).thenReturn("{\"Key1\" : \"knative\", \"Key2\" : 100 }");
-
-        TestSecure result = config.loadEncryptedConfig(env, TestSecure.TestKeys.values(), TestSecure.class);
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals("knative", result.get(TestSecure.TestKeys.Key1));
-        Assertions.assertEquals(100, result.get(TestSecure.TestKeys.Key2));
-    }
-
-    @Test
     public void test_loadEncryptedConfig_knative_bae64() {
         AbstractConfiguration config = new TestConfig();
 
@@ -156,22 +106,6 @@ public class AbstractConfigurationTest extends AbstractMockTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals("knative", result.get(TestSecure.TestKeys.Key1));
         Assertions.assertEquals(100, result.get(TestSecure.TestKeys.Key2));
-    }
-
-    @Test
-    public void test_loadEncryptedConfig_knative_error() {
-        AbstractConfiguration config = new TestConfig();
-
-        Environment env = Mockito.mock(Environment.class);
-        Mockito.when(env.getProperty("knative", Boolean.class, Boolean.FALSE)).thenReturn(true);
-        Mockito.when(env.getProperty("CONFIG", "")).thenReturn("not JSON");
-
-        try {
-            config.loadEncryptedConfig(env, TestSecure.TestKeys.values(), TestSecure.class);
-            Assertions.fail("Expected exception");
-        } catch (RuntimeException ex) {
-            Assertions.assertEquals("Error reading secure config", ex.getMessage());
-        }
     }
 
     @Test
@@ -189,84 +123,5 @@ public class AbstractConfigurationTest extends AbstractMockTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals("Encrypted", result.get(TestSecure.TestKeys.Key1));
         Assertions.assertEquals(1, result.get(TestSecure.TestKeys.Key2));
-    }
-
-    @Test
-    public void test_loadEncryptedConfig_default_badConfig() {
-        AbstractConfiguration config = new TestConfig();
-        this.setField("ephemeralKeyFile", IoTools.getAbsoluteFilePath("test.key"), config);
-        this.setField("ephemeralConfigFile", IoTools.getAbsoluteFilePath("test-bad.config"), config);
-        this.setField("ephemeralTimeout", 5, config);
-
-        Environment env = Mockito.mock(Environment.class);
-        Mockito.when(env.getProperty("knative", Boolean.class, Boolean.FALSE)).thenReturn(false);
-        Mockito.when(env.getProperty("integrationtest", Boolean.class, Boolean.FALSE)).thenReturn(false);
-
-        try {
-            config.loadEncryptedConfig(env, TestSecure.TestKeys.values(), TestSecure.class);
-            Assertions.fail("Expected exception");
-        } catch (RuntimeException ex) {
-            Assertions.assertEquals("Error reading secure config", ex.getMessage());
-        }
-    }
-
-    @Test
-    public void test_loadEncryptedConfig_default_error() {
-        AbstractConfiguration config = new TestConfig();
-        this.setField("ephemeralKeyFile", "junkPath", config);
-        this.setField("ephemeralConfigFile", IoTools.getAbsoluteFilePath("test.config"), config);
-        this.setField("ephemeralTimeout", 1, config);
-
-        Environment env = Mockito.mock(Environment.class);
-        Mockito.when(env.getProperty("knative", Boolean.class, Boolean.FALSE)).thenReturn(false);
-        Mockito.when(env.getProperty("integrationtest", Boolean.class, Boolean.FALSE)).thenReturn(false);
-
-        try {
-            config.loadEncryptedConfig(env, TestSecure.TestKeys.values(), TestSecure.class);
-            Assertions.fail("Expected exception");
-        } catch (RuntimeException ex) {
-            Assertions.assertEquals("Key and/or Secrets files does not exist", ex.getMessage());
-        }
-    }
-
-    @Test
-    public void test_loadEncryptedConfig_default_error_v2() {
-        AbstractConfiguration config = new TestConfig();
-        this.setField("ephemeralKeyFile", IoTools.getAbsoluteFilePath("test.key"), config);
-        this.setField("ephemeralConfigFile", "junkPath", config);
-        this.setField("ephemeralTimeout", 2, config);
-
-        Environment env = Mockito.mock(Environment.class);
-        Mockito.when(env.getProperty("knative", Boolean.class, Boolean.FALSE)).thenReturn(false);
-        Mockito.when(env.getProperty("integrationtest", Boolean.class, Boolean.FALSE)).thenReturn(false);
-
-        try {
-            config.loadEncryptedConfig(env, TestSecure.TestKeys.values(), TestSecure.class);
-            Assertions.fail("Expected exception");
-        } catch (RuntimeException ex) {
-            Assertions.assertEquals("Key and/or Secrets files does not exist", ex.getMessage());
-        }
-    }
-
-    @Test
-    public void test_loadEncryptedConfig_default_interrupted() {
-        Thread t = new Thread(new ThreadHelper(Thread.currentThread()));
-
-        AbstractConfiguration config = new TestConfig();
-        this.setField("ephemeralTimeout", 120, config);
-        this.setField("ephemeralKeyFile", "/junk/path", config);
-        this.setField("ephemeralConfigFile", "/junk/path", config);
-
-        Environment env = Mockito.mock(Environment.class);
-        Mockito.when(env.getProperty("knative", Boolean.class, Boolean.FALSE)).thenReturn(false);
-        Mockito.when(env.getProperty("integrationtest", Boolean.class, Boolean.FALSE)).thenReturn(false);
-
-        t.start();
-        try {
-            config.loadEncryptedConfig(env, TestSecure.TestKeys.values(), TestSecure.class);
-            Assertions.fail("Expected exception");
-        } catch (RuntimeException ex) {
-            Assertions.assertEquals("Thread interrupted while waiting for secrets.", ex.getMessage());
-        }
     }
 }

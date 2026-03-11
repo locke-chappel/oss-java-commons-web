@@ -4,12 +4,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.util.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -22,14 +25,16 @@ import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 public class HttpService {
-    private static final StringHttpMessageConverter UTF_8_CONVERTER = new StringHttpMessageConverter(StandardCharsets.UTF_8);
+    private static final StringHttpMessageConverter UTF_8_CONVERTER = new StringHttpMessageConverter(
+            StandardCharsets.UTF_8);
 
     protected static final int DEFAULT_TIMEOUT = 30 * 1000;
 
     @Autowired(required = false)
     private CustomResponseErrorHandler customResponseErrorHandler;
 
-    public <T> ResponseEntity<T> call(HttpMethod method, String url, Map<String, String> headers, Class<T> responseType, Object body) {
+    public <T> ResponseEntity<T> call(HttpMethod method, String url, Map<String, String> headers, Class<T> responseType,
+            Object body) {
         HttpHeaders requestHeaders = new HttpHeaders();
         if (headers != null) {
             headers.forEach((k, v) -> requestHeaders.add(k, v));
@@ -51,20 +56,30 @@ public class HttpService {
          *
          * Note: HttpClient is not reusable :(
          */
+        ConnectionConfig connConfig = ConnectionConfig.custom(). //
+                setConnectTimeout(Timeout.ofMicroseconds(this.getTimeout())). //
+                build();
+
         SocketConfig socketConfig = SocketConfig.custom(). //
-                setSoTimeout(this.getTimeout(), TimeUnit.MILLISECONDS). //
+                setSoTimeout(Timeout.ofMilliseconds(this.getTimeout())). //
                 build();
 
-        PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager();
-        connManager.setDefaultSocketConfig(socketConfig);
+        PoolingHttpClientConnectionManager connManager = PoolingHttpClientConnectionManagerBuilder.create(). //
+                setDefaultSocketConfig(socketConfig). //
+                setDefaultConnectionConfig(connConfig). //
+                build();
 
-        HttpClient client = HttpClientBuilder.create(). //
-                disableRedirectHandling(). //
+        RequestConfig requestConfig = RequestConfig.custom(). //
+                setResponseTimeout(Timeout.ofMilliseconds(this.getTimeout())). //
+                build();
+
+        CloseableHttpClient client = HttpClientBuilder.create(). //
+                setDefaultRequestConfig(requestConfig). //
                 setConnectionManager(connManager). //
+                disableRedirectHandling(). //
                 build();
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(client);
-        factory.setConnectTimeout(this.getTimeout());
-        return factory;
+
+        return new HttpComponentsClientHttpRequestFactory(client);
     }
 
     protected RestTemplate createRestTemplate() {

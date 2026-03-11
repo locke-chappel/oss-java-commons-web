@@ -1,7 +1,5 @@
 package io.github.lc.oss.commons.web.config;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.Clock;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,17 +15,13 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.github.lc.oss.commons.encoding.Encodings;
 import io.github.lc.oss.commons.encryption.config.ConfigKey;
 import io.github.lc.oss.commons.encryption.config.EncryptedConfig;
-import io.github.lc.oss.commons.encryption.config.EncryptedConfigUtil;
 import io.github.lc.oss.commons.serialization.TrimmingModule;
 import io.github.lc.oss.commons.util.PathNormalizer;
 import io.github.lc.oss.commons.web.controllers.ExceptionController;
 import io.github.lc.oss.commons.web.filters.SecurityHeadersFilter;
-import io.github.lc.oss.commons.web.util.PropertiesConfigUtil;
+import io.github.lc.oss.commons.web.util.ConfigLoader;
 
 public abstract class AbstractConfiguration implements WebMvcConfigurer {
     @Value("${application.ephemeral-ciphers.keyfile:${user.home}/ephemeral/key}")
@@ -65,41 +59,15 @@ public abstract class AbstractConfiguration implements WebMvcConfigurer {
         return new TrimmingModule();
     }
 
-    protected <T extends EncryptedConfig, K extends ConfigKey> T loadEncryptedConfig(@Autowired Environment env, K[] keys, Class<T> clazz) {
+    protected <T extends EncryptedConfig, K extends ConfigKey> T loadEncryptedConfig(@Autowired Environment env,
+            K[] keys, Class<T> clazz) {
         if (this.isKnative(env)) {
-            try {
-                String json = env.getProperty("CONFIG", "");
-                if (json.charAt(0) != '{') {
-                    json = Encodings.Base64.decodeString(json);
-                }
-
-                ObjectMapper mapper = new ObjectMapper();
-                return mapper.readValue(json, clazz);
-            } catch (Exception ex) {
-                throw new RuntimeException("Error reading secure config", ex);
-            }
+            return ConfigLoader.loadJsonFromEnv(env, "CONFIG", clazz);
         } else if (this.isIntegrationtest(env)) {
-            try {
-                T config = clazz.getDeclaredConstructor().newInstance();
-                PropertiesConfigUtil.loadFromEnv(config, env, "application.secure-config.", keys);
-                return config;
-            } catch (Exception ex) {
-                throw new RuntimeException("Unable to create new config object", ex);
-            }
+            return ConfigLoader.loadFromProperties(env, keys, clazz);
         } else {
-            int count = 0;
-            while (Files.notExists(Paths.get(this.ephemeralKeyFile)) || Files.notExists(Paths.get(this.ephemeralConfigFile))) {
-                count++;
-                if (count >= this.ephemeralTimeout) {
-                    throw new RuntimeException("Key and/or Secrets files does not exist");
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException("Thread interrupted while waiting for secrets.");
-                }
-            }
-            return EncryptedConfigUtil.read(this.ephemeralKeyFile, this.ephemeralConfigFile, clazz);
+            return ConfigLoader.loadFromFile(this.ephemeralKeyFile, this.ephemeralConfigFile,
+                    this.ephemeralTimeout, clazz);
         }
     }
 
